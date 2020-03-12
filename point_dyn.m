@@ -39,7 +39,7 @@ n = zeros(282, 3);
 omega = zeros(282, 1);
 
 for i = 1:1:size(xp)
-<<<<<<< Updated upstream
+
     h(i, 1:3)  = cross([xp(i); yp(i); zp(i)], [vxp(i), vyp(i), vzp(i)]);
     hk(i, 1) = h(i, 3) / mag(h(i, 1:3));
     incl(i) = rad2deg(acos(hk(i)));
