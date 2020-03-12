@@ -6,6 +6,12 @@ alt = 600;
 Rer = 6371;
 pi2 = 2*pi;
 mean_motion = sqrt(mu/(Rer+alt)^3);
+p = (Rer + alt) * 10 ^ (-3);
+ecc = 0.002;
+incl = deg2rad(98);
+omega = 0;
+argp = deg2rad(98);
+nu = ;
 
 Torb = 2 *pi / mean_motion;
 
@@ -33,6 +39,7 @@ n = zeros(282, 3);
 omega = zeros(282, 1);
 
 for i = 1:1:size(xp)
+<<<<<<< Updated upstream
     h(i, 1:3)  = cross([xp(i); yp(i); zp(i)], [vxp(i), vyp(i), vzp(i)]);
     hk(i, 1) = h(i, 3) / mag(h(i, 1:3));
     incl(i) = rad2deg(acos(hk(i)));
@@ -49,6 +56,10 @@ for i = 1:1:size(xp)
     else
         omega(i) = 2 * pi - acos(n(i, 1) / (sqrt(n(i, 2) ^ 2 + n(i, 1) ^ 2)));
     end
+=======
+   
+    res(i, 1:2) = test;
+>>>>>>> Stashed changes
 end
 
 
