@@ -25,6 +25,7 @@ xp = hp(:,1); yp = hp(:,2); zp = hp(:,3); vxp = hp(:,4); vyp = hp(:,5); vzp = hp
 
 axis equal;
 
+<<<<<<< HEAD
 [p, a, ecc, incl, omega, argp, nu, ~, ~, ~, ~] = rv2coe(hp(1,1:3) * m2km, hp(1, 4:6) * m2km);
 raan = rad2deg(0.7967);
 aop = rad2deg(2.6513);
@@ -41,4 +42,15 @@ for i=1:1:(size(hp))
     end
 end
         
+=======
+[p, a, ecc, incl, omega, argp, nu, ~, ~, ~, ~] = rv2coe(hp(1,1:3) * m2km, hp(1, 4:6) * m2km)
+raan = rad2deg(0.7967)
+aop = rad2deg(2.6513)
+ta = rad2deg(0.571)
+
+plot3(xp, yp, zp, 'r-');
+
+[r(1:3),v(1:3)] = coe2rv(p, a, ecc, incl, omega, argp, nu)
+
+>>>>>>> master
 end
