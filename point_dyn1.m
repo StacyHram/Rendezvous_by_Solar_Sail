@@ -3,7 +3,7 @@ global  mu Rer
 mu = 3.986 * 1e14;
 Rer = 6371000;
 rer = 7371000;
-real_time = clock();
+date = datetime(2020, 04, 20, 19, 26, 49); % Year, Month, Day, Hour, Minute, Second
 
 m2km = 1e-3;
 
@@ -28,7 +28,7 @@ incl = acos(spec_h(3) / abs_h); %inclination
 [tp, hp] = ode45(@point_calculate, [0 Torb], iniCond, opts);
 
 xp = hp(:,1); yp = hp(:,2); zp = hp(:,3); vxp = hp(:,4); vyp = hp(:,5); vzp = hp(:,6);
-
+r = [hp(:,1), hp(:,2), hp(:,3)];
 %[p, a, ecc, incl, omega, argp, nu, ~, ~, ~, ~] = rv2coe(hp(1,1:3) * m2km, hp(1, 4:6) * m2km);
 
 % incl = rad2deg(incl); %conversion radian to degrees
@@ -46,21 +46,19 @@ elements = double.empty(6, 0); %elements on all orbit
 
 %[p, a, ecc, incl, omega, argp, nu, ~, ~, ~, ~] = rv2coe(hp(1,1:3) * m2km, hp(1, 4:6) * m2km);%elements in point 1
 
- [jd, ~] = jday(real_time(1), real_time(2), real_time(3), real_time(4), real_time(5), real_time(6)); %julian date
- [jd_end, ~] = jday(real_time(1), real_time(2), real_time(3), real_time(4)+ fix(Torb/ (60^3)), real_time(5)+ mod(Torb, 60^2), real_time(6)+ mod(Torb,60)) %julian date
- ti = (jd_end - jd)/ length(elements)
- time_orb = [jd:ti:jd_end]
-% 
-[rsun,~,decl] = sun ( jd );%direction to sun
-r = [x0, y0, z0];
-enter_ex = zeros(i, 1);
-for i=1:1:(size(elements))
-      t = time_orb(i);
-    elements( i, 1);
-    [lit] = light ( r, t, 's' )
-    %enter_ex(i,1) = lit;
+jd_start = juliandate(date); % Start date
+jd_end = juliandate(date) + Torb/86400; % End date = Start date + Torb
+time_step = (jd_end - jd_start)/ length(hp) ; % step of time in julian dates
+time_count = [jd_start:time_step:jd_end]
+
+[rsun,~,decl] = sun ( jd_start );%direction to sun
+
+sun_side = zeros(i, 3);
+for i=1:1:(size(r))
+    [lit] = light ( r(i,:), time_count(i), 's' );
+    sun_side(i,:) = lit;
 end
-[lit] = light ( r, jd, 's' );
+
 
 %eccentric anomaly of shadow points
 % enter_ex = zeros(i, 2);
@@ -70,21 +68,21 @@ end
 %     enter_ex(i,1) = Een; enter_ex(i,2) = Eex;
 % end
 %hold on
-plot(enter_ex)
-hold on
-plot3(xp, yp, zp, 'r-');
-hold on
-plot_Earth_meters();
+plot(time_count, lit)
+% hold on
+% plot3(xp, yp, zp, 'r-');
+% hold on
+% plot_Earth_meters();
 % рисуем «емлю
 % hold on
 % plot3(rsun(1), rsun(2), rsun(3))
 
-axis equal;
-xlabel('X, м', 'FontSize',12,'FontWeight','bold','Color','b');
-ylabel('Y, м', 'FontSize',12,'FontWeight','bold','Color','b');
-zlabel('Z, м', 'FontSize',12,'FontWeight','bold','Color','b');
-
-% x = linspace(1, 2, 100);
+% axis equal;
+% xlabel('X, м', 'FontSize',12,'FontWeight','bold','Color','b');
+% ylabel('Y, м', 'FontSize',12,'FontWeight','bold','Color','b');
+% zlabel('Z, м', 'FontSize',12,'FontWeight','bold','Color','b');
+% 
+% % x = linspace(1, 2, 100);
 % y = linspace(-Rer, Rer);
 % z = sqrt(Rer ^ 2 - y.^2);
 % % z =( -x.*rsun(1) - y.*rsun(2)) / rsun(3)

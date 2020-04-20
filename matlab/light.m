@@ -45,4 +45,4 @@ function [lit] = light ( r, jd, whichkind );
 
         % ------------ is the satellite in the shadow? ----------------
         [lit] = sight( rsun,r,whichkind );
-
+        
