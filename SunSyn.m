@@ -1,8 +1,8 @@
-function f = point_calculate(t, x)
+function f = SunSyn(t, x)
     mu = 3.986 * 1e14;
     jd = 2.4590e+06;
     Rer = 6371000;
-    Fsun = 0.03*2*4.56e-6
+    Fsun = 10*2*4.56e-6;
     r = sqrt(x(1)^2 + x(2)^2 + x(3)^2);
     rx = [x(1)/Rer, x(2)/Rer, x(3)/Rer];
     
