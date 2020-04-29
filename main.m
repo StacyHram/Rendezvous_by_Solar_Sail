@@ -95,20 +95,20 @@ end
 
 %plot(time_vector, sun_side)
 
-%plot (xp);
-%hold on
-%plot(rx, 'b.');
+plot (xp);
+hold on
+plot(rx, 'b.');
 
-plot3(x, y, z, 'r-');
-hold on
-plot3(x_test, y_test, z_test, 'b.');
-hold on
-plot3(xp, yp, zp, 'r-');
-hold on
-plot3(rx, ry, rz, 'b.');
-hold on
-plot_Earth_meters();
-axis equal
+% plot3(x, y, z, 'r-');
+% hold on
+% plot3(x_test, y_test, z_test, 'b.');
+% hold on
+% plot3(xp, yp, zp, 'r-');
+% hold on
+% plot3(rx, ry, rz, 'b.');
+% hold on
+% plot_Earth_meters();
+% axis equal
 % рисуем Землю
 % hold on
 
