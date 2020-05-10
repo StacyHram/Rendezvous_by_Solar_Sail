@@ -1,4 +1,4 @@
-function point_dyn()
+function main()
 global  mu Rer Fsun jd
 mu = 3.986 * 1e14;
 Rer = 6371000;
@@ -6,8 +6,8 @@ rer = 7371000;
 date = datetime(2020, 04, 20, 19, 26, 49); % Year, Month, Day, Hour, Minute, Second
 Fsun = 0.03*2*4.56e-6;
 jd = 2.4590e+06;
+m2km = 1000;
 
-m2km = 1e-3;
 
 % %ISS
 % x0 = -4453.783586; y0 = -5038.203756; z0 = -426.384456;
@@ -46,16 +46,17 @@ Torb = 2 * pi * sma^(3/2) / sqrt(mu); %orbital period
 ecc = sqrt(1 + 2 * spec_e * (abs_h / mu)^2); %eccentricity
 incl = acos(spec_h(3) / abs_h); %inclination
 
-[tp, hp] = ode45(@SunSyn, [0 2*Torb], iniCond, opts);
+[tp, hp] = ode45(@point_calculate, [0 2*Torb], iniCond, opts);
 [tp_test, hp_test] = ode45(@test, [0 2*Torb], iniCond, opts);
-[t, rv] = ode45(@SunSyn, [0 2*Torb], km2m, opts);
-[t_test, rv_test] = ode45(@test, [0 2*Torb], km2m, opts);
+% [t, rv] = ode45(@test, [0 2*Torb], km2m, opts);
+% [t_test, rv_test] = ode45(@test, [0 2*Torb], km2m, opts);
+
 
 
 xp = hp(:,1); yp = hp(:,2); zp = hp(:,3); vxp = hp(:,4); vyp = hp(:,5); vzp = hp(:,6); %rv with SRP
-rx = hp_test(:,1); ry = hp_test(:,2); rz = hp_test(:,3); %rv without SRP
-x = rv(:,1); y = rv(:, 2); z = rv(:,3);
-x_test = rv_test(:,1); y_test = rv_test(:, 2); z_test = rv_test(:, 3);
+% rx = hp_test(:,1); ry = hp_test(:,2); rz = hp_test(:,3); %rv without SRP
+% x = rv(:,1); y = rv(:, 2); z = rv(:,3);
+% x_test = rv_test(:,1); y_test = rv_test(:, 2); z_test = rv_test(:, 3);
 
 r = [hp(:,1)/Rer, hp(:,2)/Rer, hp(:,3)/Rer];
 %[p, a, ecc, incl, omega, argp, nu, ~, ~, ~, ~] = rv2coe(hp(1,1:3) * m2km, hp(1, 4:6) * m2km);
@@ -79,17 +80,18 @@ jd_start = juliandate(date); % Start date
 
 
 [rsun,~,decl] = sun ( jd_start );%direction to sun
+ 
 
-sun_side = zeros(i+1, 1);
-for i=1:1:(size(r))
-    [lit] = light( r(i,:), jd_start+tp(i)/86400, 's' );
-    if lit == 'yes'
-        sun_side(i,1) = 1;
-    else
-        sun_side(i,1) = 0;
-    end
-    
-end
+% sun_side = zeros(i+1, 1);
+% for i=1:1:(size(r))
+%     [lit] = light( r(i,:), jd_start+tp(i)/86400, 's' );
+%     if lit == 'yes'
+%         sun_side(i,1) = 1;
+%     else
+%         sun_side(i,1) = 0;
+%     end
+%     
+% end
 
 
 
