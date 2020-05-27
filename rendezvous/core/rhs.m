@@ -5,6 +5,8 @@ function derivativeCoMCoordinates = rhs(t, rv, simulationSettings, initialCondit
   %% constants
   global AstronomicUnit;
   global day2sec;
+  global EarthGravity;
+
 
   %% coordinates
   
@@ -42,7 +44,7 @@ function derivativeCoMCoordinates = rhs(t, rv, simulationSettings, initialCondit
   
   %% Sun pressure
   
-  [pressSun, ~] = sunPressure(rECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+  [pressSun, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
     
   %% Sum all
   
