@@ -37,10 +37,15 @@ inclination = pi/2;
 
 global EarthRadius;
 global m2km; % meters -> kilometers
+global EarthGravity;
+
 in_km = (EarthRadius + altitude)*m2km;
 
 [r, v] = coe2rv( in_km, 0.000000046, inclination, 5,881760, 4,36332313, 0,383972);
 rv = [r; v] / m2km;
+Torb = 2 * pi * (EarthRadius + altitude)^(3/2) / sqrt(EarthGravity);
+simulationSettings.simulationTime = Torb*24;
+simulationSettings_test.simulationTime = Torb*24;
 
 initialConditions = struct(...
   'date', initialCondDate, ...
