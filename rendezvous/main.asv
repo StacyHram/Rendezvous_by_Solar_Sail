@@ -45,22 +45,28 @@ in_km = (EarthRadius + altitude)*m2km;
 rv = [r; v] / m2km;
 r_test = [1526972.59899351; -5161953.72250970; 4737722.63950587];
 v_test = [-1396.93459242548; 4722.35965818830; 5595.60586682747];
-Torb = 2 * pi * sma^(3/2) / sqrt(EarthGravity);;
-simulationSettings.simulationTime = Torb*24;
-simulationSettings_test.simulationTime = Torb*24;
+rv_test = double.empty(6, 0);
+rv_test = [r_test; v_test];
+Torb = 2 * pi * (EarthRadius + altitude)^(3/2) / sqrt(EarthGravity);
+
+% simulationSettings.simulationTime = Torb*24;
+% simulationSettings_test.simulationTime = Torb*24;
 
 initialConditions = struct(...
   'date', initialCondDate, ...
   'coordinatesECI', rv);
 
+initialConditions_test = struct(...
+  'date', initialCondDate, ...
+  'coordinatesECI', rv_test);
 %% step 4 - simulation
 opts = odeset('RelTol',simulationSettings.relTol,'AbsTol', simulationSettings.absTol);
 
 simulationResults = ode45(@(t, rv) rhs(t, rv, simulationSettings, initialConditions, spacecraft), ...
-                        [0 simulationSettings.simulationTime], rv, opts); 
+                        [1:1:86400], rv, opts); 
 
-simulationResults_test = ode45(@(t, rv) rhs(t, rv, simulationSettings_test, initialConditions, spacecraft2), ...
-                        [0 simulationSettings_test.simulationTime], rv, opts);
+simulationResults_test = ode45(@(t, rv_test) rhs(t, rv_test, simulationSettings_test, initialConditions_test, spacecraft2), ...
+                        1:1:86400}, rv_test, opts);
 
 %% step 5 - postprocessing and visualisation
-figureCoM = plotCoM_Torb( simulationResults, Torb);
+figureCoM = plotCoM_Torb( simulationResults, simulationResults_test);
