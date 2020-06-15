@@ -45,7 +45,7 @@ in_km = (EarthRadius + altitude)*m2km;
 rv = [r; v] / m2km;
 r_test = [1526972.59899351; -5161953.72250970; 4737722.63950587];
 v_test = [-1396.93459242548; 4722.35965818830; 5595.60586682747];
-Torb = 2 * pi * (EarthRadius + altitude)^(3/2) / sqrt(EarthGravity);
+Torb = 2 * pi * sma^(3/2) / sqrt(EarthGravity);;
 simulationSettings.simulationTime = Torb*24;
 simulationSettings_test.simulationTime = Torb*24;
 
@@ -63,4 +63,4 @@ simulationResults_test = ode45(@(t, rv) rhs(t, rv, simulationSettings_test, init
                         [0 simulationSettings_test.simulationTime], rv, opts);
 
 %% step 5 - postprocessing and visualisation
-figureCoM = plotCoM_elements( simulationResults, simulationResults_test);
+figureCoM = plotCoM_Torb( simulationResults, Torb);

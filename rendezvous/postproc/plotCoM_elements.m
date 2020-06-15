@@ -22,8 +22,8 @@ elements_test = double.empty(6, 0); %elements on all orbit
      end
  
 figureCoM = figure;
-plot( elements(:, 1), '-b');
+plot( elements(:, 2), '-b');
 hold on
-plot( elements_test(:, 1), '-r'); 
+plot( elements_test(:, 2), '-r'); 
 
 end
