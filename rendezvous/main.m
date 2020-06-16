@@ -43,10 +43,8 @@ in_km = (EarthRadius + altitude)*m2km;
 
 [r, v] = coe2rv( in_km, 0.000000046, inclination, 5,881760, 4,36332313, 0,383972);
 rv = [r; v] / m2km;
-r_test = [1526972.59899351; -5161953.72250970; 4737722.63950587];
-v_test = [-1396.93459242548; 4722.35965818830; 5595.60586682747];
-rv_test = double.empty(6, 0);
-rv_test = [r_test; v_test];
+[r_test, v_test] = coe2rv( in_km, 0.000000046, inclination, 5,881760, 4,36332313, 0,558505);
+rv_test = [r_test; v_test] / m2km;
 Torb = 2 * pi * (EarthRadius + altitude)^(3/2) / sqrt(EarthGravity);
 time_sim = [0:1:86400];
 % simulationSettings.simulationTime = Torb*24;
