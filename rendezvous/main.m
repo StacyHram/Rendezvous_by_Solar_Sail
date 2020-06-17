@@ -60,11 +60,11 @@ initialConditions_test = struct(...
 %% step 4 - simulation
 opts = odeset('RelTol',simulationSettings.relTol,'AbsTol', simulationSettings.absTol);
 
-simulationResults = ode45(@(t, rv) rhs(t, rv, simulationSettings, initialConditions, spacecraft), ...
-                        time_sim, rv, opts); 
+simulationResults = ode45(@(t, rv) rhs(t, rv, rv_test, simulationSettings, simulationSettings_test,...
+    initialConditions, spacecraft, spacecraft2), time_sim, rv, opts); 
 
-simulationResults_test = ode45(@(t, rv_test) rhs(t, rv_test, simulationSettings_test, initialConditions_test, spacecraft2), ...
-                        time_sim, rv_test, opts);
+simulationResults_test = ode45(@(t, rv_test) rhs(t, rv, rv_test, simulationSettings_test, simulationSettings_test,...
+    initialConditions, spacecraft, spacecraft2), time_sim, rv_test, opts);
 
 %% step 5 - postprocessing and visualisation
-figureCoM = plotCoM_Torb( simulationResults, simulationResults_test, time_sim);
+figureCoM = plotCoM( simulationResults);

@@ -1,5 +1,4 @@
-function derivativeCoMCoordinates = rhs(t, rv, rv_test, simulationSettings, simulationSettings_test,...
-    initialConditions, spacecraft, spacecraft2)
+function derivativeCoMCoordinates = rhs(t, rv, rv_test, simulationSettings, simulationSettings_test, initialConditions, spacecraft)
 
 % Calculates right side of ODE for motion of single point (center of mass) motion
 
