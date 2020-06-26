@@ -25,7 +25,7 @@ global EarthRadius;
 global m2km; % meters -> kilometers
 in_km = (EarthRadius + altitude)*m2km;
 
-[r, v] = coe2rv( in_km, 0.000000046, inclination, 5,881760, 4,36332313, 0,383972);
+[r, v] = coe2rv( in_km, 0.000000046, inclination, 5.881760, 4.36332313, 0.383972);
 rv = [r; v] / m2km;
 
 initialConditions = struct(...
@@ -35,9 +35,8 @@ initialConditions = struct(...
 %% step 4 - simulation
 opts = odeset('RelTol',simulationSettings.relTol,'AbsTol', simulationSettings.absTol);
 
-simulationResults = ode45(@(t, rv) rhs(t, rv, simulationSettings, initialConditions, spacecraft), ...
+simulationResults = ode45(@(t, rv) rhs_test(t, rv, simulationSettings, initialConditions, spacecraft), ...
                         [0 simulationSettings.simulationTime], rv, opts); 
 
 %% step 5 - postprocessing and visualisation
 figureCoM = plotCoM(simulationResults);
-figure; plot3(simulationResults.y(1, :), simulationResults.y(2, :), simulationResults.y(3, :) );

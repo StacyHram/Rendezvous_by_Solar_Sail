@@ -1,9 +1,9 @@
-function figureCoM = plotCoM_Torb( simulationResults, simulationResults_test, time_sim)
+function figureCoM = plotCoM_Torb( simulationResults)
 
 global EarthGravity;
 
-r_test = simulationResults_test.y (1:3,:);
 r = simulationResults.y (1:3,:);
+r_test = simulationResults.y (7:9,:);
 
 
 
@@ -12,12 +12,15 @@ for i = 1 : 1 : (size(r_test,2))
     d = vecnorm(r_test(:, i) - r(:, i));
     delta(1, i) = d;
 end
-
+%20050
 figureCoM = figure;
 % plot( simulationResults.x ,T, '-b');
 % hold on
 % plot( simulationResults_test.x, T_test, '-r.'); 
-plot( simulationResults_test.x, delta)
+plot( simulationResults.x, delta);
+% hold on
+% plot( simulationResults.x, simulationResults.y(7, :));
+
 end
 
 

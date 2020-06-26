@@ -1,4 +1,5 @@
-function derivativeCoMCoordinates = rhs(t, rv, rv_test, simulationSettings, simulationSettings_test, initialConditions, spacecraft)
+function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulationSettings_test,...
+    initialConditions, spacecraft, spacecraft2)
 
 % Calculates right side of ODE for motion of single point (center of mass) motion
 
@@ -10,17 +11,16 @@ function derivativeCoMCoordinates = rhs(t, rv, rv_test, simulationSettings, simu
 
   %% coordinates
   
-  rECI = rv(1:3);
-  vECI = rv(4:6);
-  rECI_test = rv_test(1:3);
-  vECI_test = rv_test(4:6);
+  rECI = rv_all(1:3);
+  vECI = rv_all(4:6);
+  rECI_test = rv_all(7:9);
+  vECI_test = rv_all(10:12);
   
   %% differentials
   
-  derivativeCoMCoordinates = zeros(6, 1);    
+  derivativeCoMCoordinates = zeros(12, 1);    
   derivativeCoMCoordinates(1:3) = vECI;
-  derivativeCoMCoordinates_test = zeros(6, 1);    
-  derivativeCoMCoordinates_test(1:3) = vECI_test;
+  derivativeCoMCoordinates(7:9) = vECI_test;
   
   %% date processing
   
@@ -50,14 +50,18 @@ function derivativeCoMCoordinates = rhs(t, rv, rv_test, simulationSettings, simu
   gSunECI = [0; 0; 0];
   
   %% Sun pressure
-  
-  [pressSun, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
   [pressSun_test, ~] = sunPressure_test(rECI_test, vECI_test, sunECI, simulationSettings_test.sunPressureModel, spacecraft2);
-    
+
+  d = vecnorm(rECI_test - rECI);
+  if d > 500000
+      [pressSun, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+  else
+      [pressSun, ~] = sunPressure_plus(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+  end
   %% Sum all
   
   derivativeCoMCoordinates(4:6) = gEarthECI + aECI + gSunECI + gMoonECI + pressSun;
-  derivativeCoMCoordinates_test(4:6) = gEarthECI_test + aECI_test + gSunECI + gMoonECI + pressSun_test;
+  derivativeCoMCoordinates(10:12) = gEarthECI_test + aECI_test + gSunECI + gMoonECI + pressSun_test;
 
 
 end

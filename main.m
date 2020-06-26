@@ -54,7 +54,7 @@ incl = acos(spec_h(3) / abs_h); %inclination
 
 
 xp = hp(:,1); yp = hp(:,2); zp = hp(:,3); vxp = hp(:,4); vyp = hp(:,5); vzp = hp(:,6); %rv with SRP
-% rx = hp_test(:,1); ry = hp_test(:,2); rz = hp_test(:,3); %rv without SRP
+rx = hp_test(:,1); ry = hp_test(:,2); rz = hp_test(:,3); %rv without SRP
 % x = rv(:,1); y = rv(:, 2); z = rv(:,3);
 % x_test = rv_test(:,1); y_test = rv_test(:, 2); z_test = rv_test(:, 3);
 
@@ -97,9 +97,9 @@ jd_start = juliandate(date); % Start date
 
 %plot(time_vector, sun_side)
 
-plot (xp);
+plot (xp, 'b');
 hold on
-plot(rx, 'b.');
+plot(rx, 'r');
 
 % plot3(x, y, z, 'r-');
 % hold on
