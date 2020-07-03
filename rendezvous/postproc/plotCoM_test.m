@@ -1,7 +1,6 @@
-function figureCoM = plotCoM_test( simulationResults, simulationResults_test)
-
+function figureCoM = plotCoM_test( simulationResults)
 figureCoM = figure;
-plot( simulationResults.x, simulationResults.y(3, :), '-b');
+plot( simulationResults.y(), simulationResults.y(3, :), '-b');
 hold on
 plot( simulationResults_test.x, simulationResults_test.y(3, :), '-r'); 
 

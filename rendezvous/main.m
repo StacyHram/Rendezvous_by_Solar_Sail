@@ -1,17 +1,17 @@
 %% simulation settings
 simulationSettings = struct(...
   'simulationTime', 60, ... % [sec]
-  'earthGravityModel', 'centralPlusJ2', ...
+  'earthGravityModel', 'central', ...
   'sunGravityModel', 'off', ...
   'moonGravityModel', 'off', ...
-  'sunPressureModel', 'off', ...
+  'sunPressureModel', 'on', ...
   'atmosphereModel', 'exponential', ...
   'absTol', 10^-12, ...
   'relTol', 10^-12);
 
 simulationSettings_test = struct(...
   'simulationTime', 60, ... % [sec]
-  'earthGravityModel', 'centralPlusJ2', ...
+  'earthGravityModel', 'central', ...
   'sunGravityModel', 'off', ...
   'moonGravityModel', 'off', ...
   'sunPressureModel', 'off', ...
@@ -23,7 +23,7 @@ spacecraft = struct(...
   'mass', 3, ... % [kg]
   'dragCoefficient', 2.2, ... 
   'reflectivity', 1.95, ... % dimensionless
-  'area', 30); % [m^2]
+  'area', 100); % [m^2]
 
 spacecraft2 = struct(...
   'mass', 3, ... % [kg]
@@ -38,16 +38,25 @@ inclination = pi/2;
 global EarthRadius;
 global m2km; % meters -> kilometers
 global EarthGravity;
+ global direct;
+direct=[];
+% nu_delta = double.empty(1, 0);
+% count = 1;
+
 
 in_km = (EarthRadius + altitude)*m2km;
 
-[r, v] = coe2rv( in_km, 0.000000046, inclination, 5.881760, 4.36332313, 0.383972);
-rv = [r; v] / m2km;
-[r_test, v_test] = coe2rv( in_km, 0.000000046, inclination, 5.881760, 4.36332313, 0.758505);
-rv_test = [r_test; v_test] / m2km;
+[r_test, v_test] = coe2rv( in_km, 0.000000046*0, inclination, pi, 4.36332313*0, pi/2, pi/2);
+rv_test = [r_test; v_test] / m2km
+
+[r, v] = coe2rv( in_km, 0.000000046*0, inclination, pi, 4.36332313*0, 0,0);
+rv = [r; v] / m2km
+
+
 rv_all = [rv; rv_test];
+
 Torb = 2 * pi * (EarthRadius + altitude)^(3/2) / sqrt(EarthGravity);
-time_sim = (0:1:86400*20);
+time_sim = (0:1:6400);
 % simulationSettings.simulationTime = Torb*24;
 % simulationSettings_test.simulationTime = Torb*24;
 
@@ -59,9 +68,11 @@ initialConditions = struct(...
 %% step 4 - simulation
 opts = odeset('RelTol',simulationSettings.relTol,'AbsTol', simulationSettings.absTol);
 
+
+
 simulationResults = ode45(@(t, rv_all) rhs(t, rv_all, simulationSettings, simulationSettings_test,...
     initialConditions, spacecraft, spacecraft2), time_sim, rv_all, opts);  %results of both satillite
 
 
 %% step 5 - postprocessing and visualisation
-figureCoM = plotCoM_Torb( simulationResults);
+figureCoM = plotCoM( simulationResults, nu_delta);

@@ -3,8 +3,9 @@ function figureCoM = plotCoM_Torb( simulationResults)
 global EarthGravity;
 
 r = simulationResults.y (1:3,:);
+v = simulationResults.y(4:6, :);
 r_test = simulationResults.y (7:9,:);
-
+v_test = simulationResults.y (10:12,:);
 
 
 delta = double.empty(1, 0);
@@ -12,13 +13,22 @@ for i = 1 : 1 : (size(r_test,2))
     d = vecnorm(r_test(:, i) - r(:, i));
     delta(1, i) = d;
 end
-%20050
+
+delta_v = double.empty(1, 0);
+for i = 1 : 1 : (size(r_test,2))
+    d = vecnorm(v_test(:, i) - v(:, i));
+    delta_v(1, i) = d;
+end
+
+
 figureCoM = figure;
 % plot( simulationResults.x ,T, '-b');
 % hold on
 % plot( simulationResults_test.x, T_test, '-r.'); 
 plot( simulationResults.x, delta);
-% hold on
+hold on
+plot( simulationResults.x, delta_v, '-r');
+
 % plot( simulationResults.x, simulationResults.y(7, :));
 
 end
