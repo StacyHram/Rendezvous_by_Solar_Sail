@@ -1,5 +1,5 @@
-function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulationSettings_test,...
-    initialConditions, spacecraft, spacecraft2)
+function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulationSettings_sail,...
+    initialConditions, spacecraft, spacecraft_sail, trigger)
 
 % Calculates right side of ODE for motion of single point (center of mass) motion
 
@@ -15,16 +15,14 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
   
   rECI = rv_all(1:3);
   vECI = rv_all(4:6);
-  rECI_test = rv_all(7:9);
-  vECI_test = rv_all(10:12);
- 
-
+  rECI_sail = rv_all(7:9);
+  vECI_sail = rv_all(10:12);
   
-  %% differentials
+  %% differentials 
   
   derivativeCoMCoordinates = zeros(12, 1);    
   derivativeCoMCoordinates(1:3) = vECI;
-  derivativeCoMCoordinates(7:9) = vECI_test;
+  derivativeCoMCoordinates(7:9) = vECI_sail;
   
   %% date processing
   
@@ -34,15 +32,15 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
   %% Earth gravitational force
   
   gEarthECI = gravityEarth(rECI, simulationSettings.earthGravityModel);
-  gEarthECI_test = gravityEarth(rECI_test, simulationSettings_test.earthGravityModel);
+  gEarthECI_sail = gravityEarth(rECI_sail, simulationSettings_sail.earthGravityModel);
   
   %% atmosphere
   wEarth = [0; 0; 7.29211514670698e-05];
   vRelativeECI = vECI - cross(wEarth, rECI);
-  vRelativeECI_test = vECI_test - cross(wEarth, rECI_test);
+  vRelativeECI_test = vECI_sail - cross(wEarth, rECI_sail);
   
   aECI = atmosphere(rECI, vRelativeECI, simulationSettings.atmosphereModel, spacecraft);
-  aECI_test = atmosphere(rECI_test, vRelativeECI_test, simulationSettings_test.atmosphereModel, spacecraft2);
+  aECI_sail = atmosphere(rECI_sail, vRelativeECI_test, simulationSettings_sail.atmosphereModel, spacecraft_sail);
   
   %% Moon gravity
   
@@ -51,54 +49,59 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
   %% Sun gravity
   
   sunECI = [1;0;0] * AstronomicUnit;
-  gSunECI = [0; 0; 0];
-  
-  direction_cos = dot(sunECI, vECI)/(vecnorm(vECI)*vecnorm(sunECI));
-  direct = [direct; direction_cos];
-  
-%   if direction_cos < -0.999
-%       [~, ~, ~, ~, ~, ~, nu_test, ~, ~, ~, ~] = rv2coe(rECI_test, vECI_test);
-%   end
-  
+  gSunECI = [0; 0; 0]; 
   
   %% Sun pressure
-  nu =0;
-  nu_test = 0;
+
+  direction_cos = dot(sunECI, vECI_sail)/(vecnorm(vECI_sail)*vecnorm(sunECI));
+  %direct = [direct; direction_cos];
+  ang_distance = acos(dot(rECI, rECI_sail)/(vecnorm(rECI)*vecnorm(rECI_sail)));
+  disp(ang_distance);
   
-  if (rECI(1)^2 + rECI(2)^2)^0.5 < 10000
-      [~, ~, ~, ~, ~, ~, nu, ~, ~, ~, ~] = rv2coe(rECI, vECI);
-      [~, ~, ~, ~, ~, ~, nu_test, ~, ~, ~, ~] = rv2coe(rECI_test, vECI_test);
+   
+  
+  if trigger == 0 && direction_cos < -0.82   
       
-  end
-  
-  
-  
-  
-  [pressSun_test, ~] = sunPressure_test(rECI_test, vECI_test, sunECI, simulationSettings_test.sunPressureModel, spacecraft2);
-  %[pressSun, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
-
-  delta = nu_test - nu;
-  
-  if delta >= 0.009
-      b = 1
-      [pressSun, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
-  elseif delta < 0.009 && delta > 0.001 
-      c = 2
-      [pressSun, ~] = sunPressure_plus(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+      spacecraft_sail.area = 100;
   else
-      pressSun = [0; 0; 0];
+      spacecraft_sail.area = 0.03;
   end
   
+  if ang_distance < 0.00044 
+      
+      trigger = 1;
+  end
   
-
-
+  if trigger == 1 && direction_cos > 0.82
+      spacecraft_sail.area = 100
+  else
+      spacecraft_sail.area = 0.03;
+  end
   
+   
+  if ang_distance < 0.0001
+      trigger = 2; 
+      gt = 3
+      spacecraft_sail.area = 0.03
+  end
+ 
+  [aSRP_sail, ~] = sunPressure(rECI_sail, vECI_sail, sunECI, simulationSettings_sail.sunPressureModel, spacecraft_sail);
+  [aSRP, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+
+  %delta = nu - nu_sail;
+  
+  %if delta >= 0.009
+  %    b = 1
+  %    [pressSun, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+  %elseif delta < 0.009 && delta > 0.001 
+  %    c = 2
+  %    [pressSun, ~] = sunPressure_plus(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+  %else
+  %    pressSun = [0; 0; 0];
+  %end 
   
   %% Sum all
   
-  derivativeCoMCoordinates(4:6,1) = gEarthECI + aECI + gSunECI + gMoonECI + pressSun;
-  derivativeCoMCoordinates(10:12,1) = gEarthECI_test + aECI_test + gSunECI + gMoonECI + pressSun_test;
-
-
+  derivativeCoMCoordinates(4:6,1) = gEarthECI + aECI + gSunECI + gMoonECI + aSRP;
+  derivativeCoMCoordinates(10:12,1) = gEarthECI_sail + aECI_sail + gSunECI + gMoonECI + aSRP_sail;
 end
-
