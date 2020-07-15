@@ -72,7 +72,7 @@ function [los] = sight ( r1,r2, whichkind );
           else
             tmin = ( asqrd - adotb ) / ( asqrd + bsqrd - 2.0 *adotb );
           end
-tmin
+%tmin
         % ----------------------- check los ---------------------------
         if ( (tmin < 0.0 ) | (tmin > 1.0 ) )
             los= 'yes';
@@ -84,5 +84,5 @@ tmin
                 los= 'no ';
               end
           end
-distsqrd
+%distsqrd
 

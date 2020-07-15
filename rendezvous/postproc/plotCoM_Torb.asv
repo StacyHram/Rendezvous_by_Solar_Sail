@@ -33,27 +33,27 @@ figure; plot( simulationResults.x, delta_v, '-r');
 % plot( simulationResults.x, simulationResults.y(7, :));
 T = double.empty(1, 0); %elements on all orbit
      for i=1:1:(size(r,2))
-         Torb = 2 * pi * EarthGravity/(2 * EarthGravity/sqrt(r(1, i)^2+ r(2, i)^2 + ...
-             r(3, i)^2) - sqrt(v(1,i)^2+ v(2, i)^2 + v(3, i)^2) ^ 2) ^ 3/2;
+         Torb = 2 * pi * (sqrt(r(1)^2 + r(2)^2) + r(3)^2)^(3/2) / sqrt(EarthGravity);
+
          T(1, i) = Torb;
      end
 
 T_sail = double.empty(1, 0); %elements on all orbit
      for i=1:1:(size(r_sail,2))
-        Torb = 2 * pi * EarthGravity/(2 * EarthGravity/sqrt(r_sail(1, i)^2+ r_sail(2, i)^2 +...
-            r_sail(3, i)^2) - sqrt(v_sail(1,i)^2+ v_sail(2, i)^2 + v_sail (3, i)^2) ^ 2) ^ 3/2;
+        Torb = 2 * pi * (sqrt(r_sail(1, i)^2 + r_sail(2, i)^2) + r_sail(3)^2)^(3/2) / sqrt(EarthGravity);
+
         T_sail(1, i) = Torb;
      end
      
 figure;
-plot(T);
+plot(T, 'r.');
 hold on
-plot(T_sail, 'g.');
+plot(T_sail, 'g-');
 
-[p, a, ecc, incl, argp, lan, nu] = [r, v]*m2km;
-[p_sail, a_sail, ecc_sail, incl_sail, argp_sail, lan_sail, nu_sail] = [r_sail, v_sail]* m2km;
-
-plot(simulationResults.x)
+% [p, a, ecc, incl, argp, lan, nu] = [r, v]*m2km;
+% [p_sail, a_sail, ecc_sail, incl_sail, argp_sail, lan_sail, nu_sail] = [r_sail, v_sail]* m2km;
+% 
+% plot(simulationResults.x, )
 end
 
 

@@ -15,7 +15,7 @@ simulationSettings_sail = struct(...
   'sunGravityModel', 'off', ...
   'moonGravityModel', 'off', ...
   'sunPressureModel', 'on', ...
-  'atmosphereModel', 'exponential', ...
+  'atmosphereModel', 'off', ...
   'absTol', 10^-12, ...
   'relTol', 10^-12);
 %% step 2 - spacecraft parameters
@@ -29,7 +29,7 @@ spacecraft_sail = struct(...
   'mass', 3, ... % [kg]
   'dragCoefficient', 2.2, ... 
   'reflectivity', 1.9, ... % dimensionless
-  'area', 200); % [m^2]
+  'area', 100); % [m^2]
 
 %% step 3 - initial conditions
 initialCondDate = datetime(2020, 04, 20, 19, 26, 49);
@@ -49,7 +49,7 @@ direct=[];
 
 altitude_km = (EarthRadius + altitude) * m2km;
 
-[r, v] = coe2rv( altitude_km, ecc, inclination, LAN, AoP, pi/3600, pi/3600);
+[r, v] = coe2rv( altitude_km, ecc, inclination, LAN, AoP, pi/360, pi/360);
 rv = [r; v] / m2km;
 
 [r_sail, v_sail] = coe2rv( altitude_km, ecc, inclination, LAN, AoP, 0, 0);
@@ -58,7 +58,7 @@ rv_sail = [r_sail; v_sail] / m2km;
 rv_all = [rv; rv_sail];
 
 Torb = 2 * pi * (EarthRadius + altitude)^(3/2) / sqrt(EarthGravity);
-time_sim = (0:1:50*Torb);
+time_sim = (0:1:10*Torb);
 % simulationSettings.simulationTime = Torb*24;
 % simulationSettings_test.simulationTime = Torb*24;
 trigger=0;
