@@ -1,5 +1,5 @@
 function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulationSettings_sail,...
-    initialConditions, spacecraft, spacecraft_sail, trigger)
+    initialConditions, spacecraft, spacecraft_sail)
 
 % Calculates right side of ODE for motion of single point (center of mass) motion
 
@@ -7,9 +7,9 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
   global AstronomicUnit;
   global day2sec;
   global EarthGravity;
-  global m2km;
+  global deg2rad;
   global direct;
-
+  global ctrl_settings;
 
   %% coordinates
   
@@ -35,72 +35,63 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
   gEarthECI_sail = gravityEarth(rECI_sail, simulationSettings_sail.earthGravityModel);
   
   
-  
   %% Moon gravity
   
   gMoonECI = [0; 0; 0];
 
   %% Sun gravity
   
-  sunECI = [1;0;0] * AstronomicUnit;
+  sunECI = [1; 0; 0] * AstronomicUnit;
   gSunECI = [0; 0; 0]; 
   
   %% Sun pressure
 
   direction_cos = dot(sunECI, vECI_sail)/(vecnorm(vECI_sail)*vecnorm(sunECI));
-  %direct = [direct; direction_cos];
-  ang_distance = acos(dot(rECI, rECI_sail)/(vecnorm(rECI)*vecnorm(rECI_sail)));
-  disp(ang_distance);
-  
-  Torb = 2 * pi * (sqrt(rECI(1)^2 + rECI(2)^2 + rECI(3)^2))^(3/2) / sqrt(EarthGravity);
+  angle_matrix=[1; 1; 1];
 
-  Torb_sail = 2 * pi * (sqrt(rECI_sail(1)^2 + rECI_sail(2)^2 + rECI_sail(3)^2))^(3/2) / sqrt(EarthGravity);
-  
-  
-  if ang_distance < 0.0044 && ang_distance > 0.0005
-          trigger = 1;
-          
-  elseif ang_distance < 0.0005
-          trigger = 2;
-  end 
-  
-  if trigger == 0 && direction_cos < -0.82 
-      
-      spacecraft_sail.area = 100;
-      spacecraft_sail.reflectivity = 1.9;
-      
-  elseif trigger == 1 && direction_cos > 0.82
-          spacecraft_sail.area = 100;
-          spacecraft_sail.reflectivity = 1.9;
+  Torb = 2 * pi * sqrt(vecnorm(rECI)^3 / EarthGravity);
+  Torb_sail = 2 * pi * sqrt(vecnorm(rECI_sail)^3 / EarthGravity);
     
-      
-  else
-      spacecraft_sail.area = 0.03;
-      spacecraft_sail.reflectivity = 1.3;
-  end
-  
-  
-  
-%   if trigger == 2; 
-%       spacecraft_sail.area = 0.03
-%       spacecraft_sail.reflectivity = 1.3
-%   end
- 
-  [aSRP_sail, ~] = sunPressure(rECI_sail, vECI_sail, sunECI, simulationSettings_sail.sunPressureModel, spacecraft_sail);
-  [aSRP, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+  if direction_cos < ctrl_settings.ctrl_arc_bound_cos  
 
-  %delta = nu - nu_sail;
+    ang_distance = acos(dot(rECI, rECI_sail)/(vecnorm(rECI)*vecnorm(rECI_sail)));
+    disp(ang_distance);
+    disp(ctrl_settings.ctrl_phase);      
+    disp(t / Torb);
+    
+    if ang_distance < ctrl_settings.ang_tolerance
+        ctrl_settings.ctrl_phase = 'cpNone';
+    elseif strcmp(ctrl_settings.ctrl_phase, 'cpNone')
+        ctrl_settings.ctrl_phase = 'cpNone';
+    elseif ang_distance < ctrl_settings.ini_ang_dist/1.8
+        ctrl_settings.ctrl_phase = 'cpAcc';        
+    else
+        ctrl_settings.ctrl_phase = 'cpDec';
+    end      
+      
+      switch ctrl_settings.ctrl_phase
+          case 'cpDec'
+      
+            spacecraft_sail.area = 100;
+            spacecraft_sail.reflectivity = 1.9;
+            angle_matrix=[cos(-45*deg2rad);sin(-45*deg2rad); 0];
+          
+          case 'cpAcc'
+            spacecraft_sail.area = 100;
+            spacecraft_sail.reflectivity = 1.91;
+            
+          
+          otherwise
+            spacecraft_sail.area = 0.03;
+            spacecraft_sail.reflectivity = 1.3; 
+            
+      end
+  end
+ 
   
-  %if delta >= 0.009
-  %    b = 1
-  %    [pressSun, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
-  %elseif delta < 0.009 && delta > 0.001 
-  %    c = 2
-  %    [pressSun, ~] = sunPressure_plus(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
-  %else
-  %    pressSun = [0; 0; 0];
-  %end 
-  
+  [aSRP_sail, ~] = sunPressure(rECI_sail, vECI_sail, sunECI, simulationSettings_sail.sunPressureModel, spacecraft_sail, angle_matrix);
+  [aSRP, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft, angle_matrix);
+
   %% atmosphere
   wEarth = [0; 0; 7.29211514670698e-05];
   vRelativeECI = vECI - cross(wEarth, rECI);

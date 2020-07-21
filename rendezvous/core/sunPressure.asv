@@ -1,4 +1,4 @@
-function [pressSun, isVisible] = sunPressure(rECI, vECI, sunECI, sunPressureModel, spacecraft, angle_matrix)
+function [pressSun, isVisible] = sunPressure(rECI, vECI, sunECI, sunPressureModel, spacecraft)
   
   global SunPressure;
   global AstronomicUnit;
@@ -16,7 +16,7 @@ function [pressSun, isVisible] = sunPressure(rECI, vECI, sunECI, sunPressureMode
 
       if isVisible
             pressSun = -1 / spacecraft.mass * spacecraft.area * spacecraft.reflectivity * SunPressure * AstronomicUnit^2 * ...
-                   (sunECI - rECI) / norm(sunECI - rECI)^3.*angle_matrix ;
+                   (sunECI - rECI) / norm(sunECI - rECI)^3 ;
       else
         pressSun = [0; 0; 0];
       end

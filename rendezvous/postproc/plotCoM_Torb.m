@@ -13,7 +13,7 @@ v_sail = simulationResults.y (10:12,:);
 delta = double.empty(1, 0);
 for i = 1 : 1 : (size(r_sail,2))
     d = vecnorm(r_sail(:, i) - r(:, i));
-    delta(1, i) = d;
+    delta(1, i) = d/1000;
 end
 
 delta_v = double.empty(1, 0);
@@ -27,8 +27,10 @@ figureCoM = figure;
 % plot( simulationResults.x ,T, '-b');
 % hold on
 % plot( simulationResults_test.x, T_test, '-r.'); 
-plot( simulationResults.x, delta);
-figure; plot( simulationResults.x, delta_v, '-r');
+plot( simulationResults.x/60, delta);
+xlabel('Время, мин');
+ylabel('Расстояние, км')
+figure; plot( simulationResults.x/60, delta_v, '-r');
 
 % plot( simulationResults.x, simulationResults.y(7, :));
 T = double.empty(1, 0); %elements on all orbit
