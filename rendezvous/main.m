@@ -58,7 +58,7 @@ rv_sail = [r_sail; v_sail] / m2km;
 rv_all = [rv; rv_sail];
 
 Torb = 2 * pi * (EarthRadius + altitude)^(3/2) / sqrt(EarthGravity);
-time_sim = (0:1:50*Torb);
+time_sim = (0:1:40*Torb);
 % simulationSettings.simulationTime = Torb*24;
 % simulationSettings_test.simulationTime = Torb*24;
 

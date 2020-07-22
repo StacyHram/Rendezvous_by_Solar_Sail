@@ -7,7 +7,7 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
   global AstronomicUnit;
   global day2sec;
   global EarthGravity;
-  global m2km;
+  global deg2rad;
   global direct;
   global ctrl_settings;
 
@@ -47,7 +47,7 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
   %% Sun pressure
 
   direction_cos = dot(sunECI, vECI_sail)/(vecnorm(vECI_sail)*vecnorm(sunECI));
-  %direct = [direct; direction_cos];
+  alpha=0;
 
   Torb = 2 * pi * sqrt(vecnorm(rECI)^3 / EarthGravity);
   Torb_sail = 2 * pi * sqrt(vecnorm(rECI_sail)^3 / EarthGravity);
@@ -63,7 +63,7 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
         ctrl_settings.ctrl_phase = 'cpNone';
     elseif strcmp(ctrl_settings.ctrl_phase, 'cpNone')
         ctrl_settings.ctrl_phase = 'cpNone';
-    elseif ang_distance < ctrl_settings.ini_ang_dist/
+    elseif ang_distance < ctrl_settings.ini_ang_dist/1.5
         ctrl_settings.ctrl_phase = 'cpAcc';        
     else
         ctrl_settings.ctrl_phase = 'cpDec';
@@ -73,20 +73,24 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
           case 'cpDec'
       
             spacecraft_sail.area = 100;
-            spacecraft_sail.reflectivity = 1;        
+            spacecraft_sail.reflectivity = 1.9;
+            alpha = 0;
           
           case 'cpAcc'
             spacecraft_sail.area = 100;
-            spacecraft_sail.reflectivity = 1.91;              
+            spacecraft_sail.reflectivity = 1.9;
+            
           
           otherwise
             spacecraft_sail.area = 0.03;
-            spacecraft_sail.reflectivity = 1.3;        
+            spacecraft_sail.reflectivity = 1.3; 
+            
       end
   end
  
-  [aSRP_sail, ~] = sunPressure(rECI_sail, vECI_sail, sunECI, simulationSettings_sail.sunPressureModel, spacecraft_sail);
-  [aSRP, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft);
+  
+  [aSRP_sail, ~] = sunPressure(rECI_sail, vECI_sail, sunECI, simulationSettings_sail.sunPressureModel, spacecraft_sail, alpha);
+  [aSRP, ~] = sunPressure(rECI, vECI, sunECI, simulationSettings.sunPressureModel, spacecraft, alpha);
 
   %% atmosphere
   wEarth = [0; 0; 7.29211514670698e-05];
@@ -97,7 +101,6 @@ function derivativeCoMCoordinates = rhs(t, rv_all, simulationSettings, simulatio
   aECI_sail = atmosphere(rECI_sail, vRelativeECI_test, simulationSettings_sail.atmosphereModel, spacecraft_sail);
   %% Sum all
   
-  a= vecnorm(aSRP_sail)-vecnorm(aECI_sail)
   derivativeCoMCoordinates(4:6,1) = gEarthECI + aECI + gSunECI + gMoonECI + aSRP;
   derivativeCoMCoordinates(10:12,1) = gEarthECI_sail + aECI_sail + gSunECI + gMoonECI + aSRP_sail;
 end

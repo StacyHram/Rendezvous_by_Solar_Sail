@@ -31,8 +31,6 @@ plot( simulationResults.x/60, delta);
 xlabel('Время, мин');
 ylabel('Расстояние, км')
 figure; plot( simulationResults.x/60, delta_v, '-r');
-xlabel('Время, мин');
-ylabel('Разница скоростей, км');
 
 % plot( simulationResults.x, simulationResults.y(7, :));
 % T = double.empty(1, 0); %elements on all orbit

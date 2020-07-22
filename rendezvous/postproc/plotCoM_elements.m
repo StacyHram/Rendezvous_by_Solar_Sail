@@ -21,14 +21,14 @@ elements_test = double.empty(6, 0); %elements on all orbit
          elements_test(4, i) = omega; elements_test(5, i) = argp; elements_test(6, i) = nu;
      end
  
-     vecnorm(rv_sail(4:6,1))-vecnorm(rv_sail(4:6,697))
      
-figureCoM = figure;
-plot( simulationResults.x/60, elements(5, :), '-b');
-hold on
-plot( simulationResults.x/60, elements_test(5, :), '-r'); 
-xlabel ('Время, мин')
-ylabel ('Долгота восходящего узла, рад')
+     
+% figureCoM = figure;
+% plot( simulationResults.x/60, elements(5, :), '-b');
+% hold on
+% plot( simulationResults.x/60, elements_test(5, :), '-r'); 
+% xlabel ('Время, мин')
+% ylabel ('Долгота восходящего узла, рад')
 
 figureCoM = figure;
 plot( simulationResults.x/60, elements(1, :), '-b');
